@@ -1,5 +1,5 @@
-TOOL.Category = "My Tools"
-TOOL.Name = "Spawn"
+TOOL.Category = "Randomize here!"
+TOOL.Name = "Spawn Tool"
 TOOL.Mode = "sasbaka"
 
 TOOL.ClientConVar = {
@@ -18,8 +18,8 @@ end
 
 if CLIENT then
 
-    concommand.Add("spawnpoint_activate_all", function()
-        net.Start("spawnpoint_activate_all")
+    concommand.Add("RH_activate_all", function()
+        net.Start("RH_activate_all")
         net.SendToServer()
     end)
 
@@ -55,7 +55,7 @@ if CLIENT then
 
         panel:AddControl("Button", {
             Text = "Активировать точки",
-            Command = "spawnpoint_activate_all"
+            Command = "RH_activate_all"
         })
 
     end

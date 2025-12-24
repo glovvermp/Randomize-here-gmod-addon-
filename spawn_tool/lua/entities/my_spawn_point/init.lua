@@ -37,7 +37,7 @@ function ENT:SetItemsFromString(str)
     GLOBAL_SPAWN_ITEMS = tbl
 end
 -----
-net.Receive("spawnpoint_activate_all", function(_, ply)
+net.Receive("RH_activate_all", function(_, ply)
 
     for _, ent in ipairs( ents.FindByClass("my_spawn_point") ) do
         if IsValid(ent) then
@@ -47,7 +47,7 @@ net.Receive("spawnpoint_activate_all", function(_, ply)
 
 end)
 -----
-net.Receive("spawn_point_set_items", function(_, ply)
+net.Receive("RH_A_set_items", function(_, ply)
 
     local text = net.ReadString()
 
