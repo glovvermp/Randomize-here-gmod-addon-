@@ -1,9 +1,8 @@
 TOOL.Category = "Randomize here!"
-TOOL.Name = "Spawn Tool"
+TOOL.Name = "Spawn Tool - A"
 TOOL.Mode = "sasbaka"
-
 TOOL.ClientConVar = {
-    items = "weapon_pistol, item_healthkit"
+    items = "weapon_pistol"
 }
 
 function TOOL:LeftClick(trace)
@@ -26,7 +25,7 @@ if CLIENT then
     concommand.Add("spawnpoint_apply_items", function()
         local text = GetConVar("sasbaka_items"):GetString()
         print(text)
-        net.Start("spawn_point_set_items")
+        net.Start("RH_A_set_items")
         net.WriteString(text)
         net.SendToServer()
     end)
