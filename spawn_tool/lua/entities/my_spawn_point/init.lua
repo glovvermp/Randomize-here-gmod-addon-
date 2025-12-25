@@ -47,6 +47,16 @@ net.Receive("RH_activate_all", function(_, ply)
 
 end)
 -----
+net.Receive("RH_A_clear_all", function(_, ply)
+
+    for _, ent in ipairs( ents.FindByClass("my_spawn_point") ) do
+        if IsValid(ent) then
+            ent:Remove()
+        end
+    end
+
+end)
+-----
 net.Receive("RH_A_set_items", function(_, ply)
 
     local text = net.ReadString()
@@ -55,4 +65,17 @@ net.Receive("RH_A_set_items", function(_, ply)
         ent:SetItemsFromString(text)
     end
     
+end)
+-----
+net.Receive("RH_visible_toggle", function(_, ply)
+
+    local visible = net.ReadBool()
+
+    for _, ent in ipairs( ents.FindByClass("my_spawn_point") ) do
+        if IsValid(ent) then
+            ent:SetNoDraw(not visible)
+        end
+        
+    end
+
 end)
