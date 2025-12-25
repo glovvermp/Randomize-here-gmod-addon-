@@ -7,11 +7,13 @@ GLOBAL_SPAWN_ITEMS = {
 }
 -----
 function ENT:Initialize()
-    self:SetModel("models/props_junk/garbage_metalcan002a.mdl")
+    self:SetModel("models/hunter/misc/sphere025x025.mdl")
     self:SetMaterial("models/wireframe")
     self:SetNoDraw(false)
     self:SetSolid(SOLID_NONE)
     self:SetMoveType(MOVETYPE_NONE)
+    self:SetModelScale(0.5, 0)
+    self:DrawShadow(false)
 
     self:SpawnRandomItem()
 end

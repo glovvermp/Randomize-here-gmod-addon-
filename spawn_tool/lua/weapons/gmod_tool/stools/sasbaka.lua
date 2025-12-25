@@ -4,7 +4,7 @@ TOOL.Mode = "sasbaka"
 
 TOOL.ClientConVar = {
 
-    items = "weapon_pistol"
+    items = "weapon_pistol",
     swich = "1"
 
 }
