@@ -4,7 +4,7 @@ TOOL.Mode = "sasbaka"
 
 if CLIENT then
     language.Add("tool.sasbaka.name", "Spawn Tool")      -- название
-    language.Add("tool.sasbaka.desc", "spawn point for random items") -- описание
+    language.Add("tool.sasbaka.desc", "Spawn point for random items") -- описание
     language.Add("tool.sasbaka.0", "Left click to spawn, Right click on a point to delete") -- инструкция
 end
 
