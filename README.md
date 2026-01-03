@@ -1,95 +1,117 @@
-# Аддон на Garry's mod
+- [🇷🇺 Русская версия](README-RU.md)
+
+# Garry's Mod Addon
 ## "Randomize here! – Spawn Point Randomizer"
 
-### Этот аддон позволяет создавать точки на карте с рандомным спавном предметов. Поддерживает оружие и энтити.
+> This addon allows you to create points on the map with random item spawning.  
+> Supports weapons (SWEPs) and entities.
 
-Моя версия аддона для создания точек с рандомным спавном заданных предметов.
+This is my own version of an addon for creating points with random spawn of specified items.
 
-Первый аддон написанный мною. Glua изучался в процессе создания и весь аддон был написан примерно за неделю. Планируются обновления и поддержка.
+This is the first addon I’ve written. I learned GLua during development, and the entire addon was created in about one week.  
+Updates and further support are planned.
 
 > [!CAUTION]
-> - **Возможны баги.** Мод не полностью проверен и будет исправляться в процессе.
-> - **У точек нет лимита! Осторожнее с их количеством на карте.**
-> - **Взаимодействовать со всем функционалом на данный момент могут все игроки. Вскоре все функции будут доступны лишь для игроков имеющих статус администратора.**
+> - **Bugs are possible.** The addon has not been fully tested and will be fixed over time.
+> - **Spawn points have no limit! Be careful with the amount placed on a map.**
+> - **Currently, all players can interact with all addon functionality.**
+>   Admin-only access is planned in future updates.
+> - **No save system temporarily**
 
 > [!NOTE]
-> Чтобы добавить предмет, откройте меню мода, создайте ID предмета и нажмите на его имя в списке. Появится меню настройки, где можно указать желаемые предметы, их шанс появления и количество. _(количество предметов определяется в случайном диапазоне от 1 до вашего заданного количества)_
-> #### Название предмета который вы хотите указать можно так:
-> 1. Откройте меню спавна (на C или f1) 
-> 2. Нажмите правой кнопкой мыши на нужный предмет и выберите пункт "Скопировать в буфер обмена"
-> 3. В нужные пункты меню вставьте скопированное
+> To add an item, open the addon menu, create an item ID and click its name in the list.  
+> A configuration menu will appear where you can specify:
+> - items to spawn
+> - spawn chance
+> - maximum amount  
+> _(the actual amount is randomized between 1 and the specified value)_
 >
-> А затем нажмите "применить/Apply", и ID точек появятся в списке в меню инструмента.
+> #### How to get the item name:
+> 1. Open the spawn menu (C or F1)
+> 2. Right-click the desired item and select **"Copy to Clipboard"**
+> 3. Paste the copied value into the addon menu
+>
+> Then click **Apply**, and the point IDs will appear in the tool menu list.
 
-- ### [-> Установка аддона <-](#Установка)
-
-- #### [< Связь с разработчиками >](#Баг-репорты)
+- ### [-> Addon Installation <-](#installation)
+- #### [< Developer Contact >](#bug-reports)
 
 ---
-### Доступные для спавна типы:
 
-✅ - Любое из данного пункта
-❌ - Ничего из данного пункта
+## Spawnable item types
 
-| Тип | Доступен к спавну |
-|-----|--------|
-| Оружие/Swep | ✅ |
-| Энтити | ✅ |
-| Проп | ❌ |
-| Транспорт | ❌ |
-| НИП/НПС | ❌ |
+✅ – Allowed  
+❌ – Not supported
+
+| Type | Spawnable |
+|------|-----------|
+| Weapon / SWEP | ✅ |
+| Entity | ✅ |
+| Prop | ❌ |
+| Vehicle | ❌ |
+| NPC | ❌ |
 
 > [!CAUTION]
-> Если вы впишите что-то из указанного в таблице как "❌" в список предметов точки, то вероятнее всего получите ошибку или отсутствие данного предмета при спане.
+> If you add an unsupported type (marked ❌) to a spawn point, it will most likely result in errors or the item not spawning.
 
 ---
-### Установка 
-Скопируйте или переместите папку "spawn_tool" в папку игры:
-GarrysMod\garrysmod\addons
 
-### Для лицензионной версии steam (если вам не известно как установить):
+## Installation
 
-1. Откройте Garry's mod в библиотеке
-2. Нажмите на гайку (справа от "играть") управление -> посмотреть локальные файлы
-3. Откройте папку garrysmod и там будет папка addons 
+Copy or move the `spawn_tool` folder into:
+GarrysMod/garrysmod/addons
 
+
+### Steam version (if you are unsure how to install):
+
+1. Open **Garry's Mod** in your Steam Library
+2. Click the gear icon → **Manage** → **Browse local files**
+3. Open the `garrysmod` folder, then the `addons` folder
 
 > [!NOTE]
-> Зачастую мод установленный в папку игры не отображается в меню "Дополнения" внутри игры. Это нормально, ведь в данном меню на лицензионной версии игры отображаются лишь предметы из мастерской на которые вы подписаны.
+> Addons installed directly into the game folder usually do not appear in the in-game **Addons** menu.  
+> This is normal — that menu only shows Workshop subscriptions.
 
 ---
-### Комманда для бинда на определенную кнопку
 
-Вы можете активировать все существующие точки на карте через нажатие кнопки клавиатуры, а не в меню инструмента
+## Bind command
 
-1. откройте игровую консоль (нажатием клавиши ~)
-2. введите к данную команду:
+You can activate all existing spawn points on the map using a keyboard button instead of the tool menu.
+
+1. Open the game console (`~`)
+2. Enter the command:
+```txt
+bind "N" "RH_activate_all"
 ```
- bind "N" "RH_activate_all"
-```
-3. если вы хотите другую кнопку, то просто замените букву внутри первых кавычек. Например _"G" "ctrl" "f1" или "MOUSE4" для боковой кнопки мыши_
----
-
-### Статус планируемых функций:
-
-- [x] Основные функции мода
-- [x] Фиксированный шанс появления предметов
-- [x] Переключение между разными типами точек
-- [x] Интерфейс
-- [ ] Лимит точек на карте
-- [ ] Точки со спавном по зоне вокруг себя
-- [ ] Выбор цвета точки
-- [ ] Активация отдельных ID
+3. To use a different key, replace "N" with another key
+(e.g. "G", "CTRL", "F1", or "MOUSE4")
 
 ---
-### Баг-репорты
 
-Создать ветку обсуждений можно напрямую в [issues](https://github.com/glovvermp/Randomize-here-gmod-addon-/issues)
+## Planned features status
 
-### Авторы аддона
+- [x] Core addon functionality
+- [x] Fixed spawn chance
+- [x] Switching between different point types
+- [x] User interface
+- [ ] Spawn point limit
+- [ ] Area-based spawn points
+- [ ] Spawn point color selection
+- [ ] Individual ID activation
 
-Heyzo - Структура и код
-> Написать в Discord - glover_mp
+---
 
-Pplane - задумка аддона и прототипная версия
-> Контакты временно нет возможности указать
+## Bug reports
+
+You can create an issue directly on GitHub:
+https://github.com/glovvermp/Randomize-here-gmod-addon-/issues
+
+## Addon authors
+
+Heyzo — structure and code
+
+> Discord: glover_mp
+
+Pplane — addon concept and prototype version
+
+> Contact information currently unavailable
