@@ -1,29 +1,35 @@
 TOOL.Category = "Randomize here!"
 TOOL.Name = "Spawn Tool"
-TOOL.Mode = "sasbaka"
+TOOL.Mode = "rhtool"
 
 if CLIENT then
-    language.Add("tool.sasbaka.name", "Spawn Tool")      -- название
-    language.Add("tool.sasbaka.desc", "Spawn point for random items") -- описание
-    language.Add("tool.sasbaka.0", "Left click to spawn, Right click on a point to delete") -- инструкция
+    language.Add("tool.rhtool.name", "Spawn Tool")      -- название
+    language.Add("tool.rhtool.desc", "Spawn point for random items") -- описание
+    language.Add("tool.rhtool.0", "Left click to spawn, Right click on a point to delete") -- инструкция
 end
 
 TOOL.ClientConVar = {
 
     items = "weapon_pistol",
     swich = "1",
-    freezed = "0",
-    iDlist = "empty",
+    debugLabels = "1",
+    iDlist = "Blank point",
     choosed = "0"
+
 }
 
 function TOOL:LeftClick(trace)
     if CLIENT then return true end
 
-    local ISvisible = GetConVar("sasbaka_swich"):GetString()
-    local choosedID = GetConVar("sasbaka_choosed"):GetString()
+
+    local ply = self:GetOwner()
+    if not IsValid(ply) then return false end
+
+
+    local ISvisible = GetConVar("rhtool_swich"):GetString()
+    local choosedID = GetConVar("rhtool_choosed"):GetString()
     
-    local ent = ents.Create("my_spawn_point")
+    local ent = ents.Create("rh_common_unit")
     ent:SetPos(trace.HitPos)
 
     ent:SetID(choosedID)
@@ -34,35 +40,36 @@ function TOOL:LeftClick(trace)
     return true
 end
 
+
+
+
+
 function TOOL:RightClick(trace)
     if CLIENT then return true end
+
+
+    local ply = self:GetOwner()
+    if not IsValid(ply) then return false end
+
 
     local ent = trace.Entity
 
     if not IsValid(ent) then return false end
-    if ent:GetClass() ~= "my_spawn_point" then return false end
+    if ent:GetClass() ~= "rh_common_unit" then return false end
 
     ent:Remove()
 
     return true
 end
 
+
 if CLIENT then
 
-    cvars.AddChangeCallback("sasbaka_swich", function(convar, old, new)
+    cvars.AddChangeCallback("rhtool_swich", function(convar, old, new)
 
-        local RH_visible = GetConVar("sasbaka_swich"):GetString()
+        local RH_visible = GetConVar("rhtool_swich"):GetString()
 
         net.Start("RH_visible_toggle")
-        net.WriteBool(new == "1")
-        net.SendToServer()
-    end)
-    ---
-    cvars.AddChangeCallback("sasbaka_freezed", function(convar, old, new)
-
-        local RH_freezed = GetConVar("sasbaka_freezed"):GetString()
-
-        net.Start("RH_freezed_toggle")
         net.WriteBool(new == "1")
         net.SendToServer()
     end)
@@ -70,18 +77,37 @@ if CLIENT then
     -----------------------
 
     concommand.Add("RH_activate_all", function()
+
+    if not LocalPlayer():IsAdmin() then
+        print("Доступ запрещен!")
+        notification.AddLegacy("У вас нет прав администратора!", NOTIFY_ERROR, 5)
+        surface.PlaySound("buttons/button10.wav")
+        return false -- Отменяет открытие меню
+    end
+
         net.Start("RH_activate_all")
         net.SendToServer()
     end)
 
     concommand.Add("RH_A_clear_all", function()
+
+    if not LocalPlayer():IsAdmin() then
+        print("Доступ запрещен!")
+        notification.AddLegacy("У вас нет прав администратора!", NOTIFY_ERROR, 5)
+        surface.PlaySound("buttons/button10.wav")
+        return false -- Отменяет открытие меню
+    end
+
         net.Start("RH_A_clear_all")
         net.SendToServer()
     end)
 
+
     -------
 
+
     function TOOL.BuildCPanel(panel)
+
         panel:AddControl("Header", {
             Text = "Spawn Point Tool",
             Description = "Creates and removes a spawn point"
@@ -91,19 +117,16 @@ if CLIENT then
              Text = "Spawn Point ID" 
         })
 
-        -- создаём выпадающий список один раз
         local combo = vgui.Create("DComboBox")
         combo:SetTall(22)
         combo:SetValue("Select an item from the list")
-
         panel:AddItem(combo)
 
         -- функция для обновления списка из ConVar
         local function UpdateCombo()
-            combo:Clear() -- очищаем старые элементы
-
+            combo:Clear()
             -- получаем строку с элементами через запятую без пробелов
-            local raw = GetConVar("sasbaka_iDlist"):GetString()
+            local raw = GetConVar("rhtool_iDlist"):GetString()
             if raw == "" then return end
 
             local items = string.Explode(",", raw)
@@ -112,25 +135,40 @@ if CLIENT then
                 combo:AddChoice(item, item)
             end
 
-            -- можно выбрать первый элемент по умолчанию
             if #items > 0 then
                 combo:SetValue(items[1])
-                RunConsoleCommand("sasbaka_choosed", items[1])
+                RunConsoleCommand("rhtool_choosed", items[1])
             end
         end
 
-        -- изначально заполняем список
         UpdateCombo()
 
         -- обработка выбора
         combo.OnSelect = function(_, _, value)
-            RunConsoleCommand("sasbaka_choosed", value)
+            RunConsoleCommand("rhtool_choosed", value)
         end
 
         -- обновление списка при изменении ConVar
-        cvars.AddChangeCallback("sasbaka_iDlist", function(convar_name, old_value, new_value)
+        cvars.AddChangeCallback("rhtool_iDlist", function(convar_name, old_value, new_value)
             UpdateCombo()
-        end, "UpdateSasbakaCombo")
+        end, "UpdaterhtoolCombo")
+
+
+        local spacerlist = vgui.Create("DPanel", panel)
+        spacerlist:SetTall(40)
+        spacerlist:Dock(TOP)
+        spacerlist.Paint = nil
+
+        
+        panel:AddControl("CheckBox", {
+            Label = "Show spawn points (see all players)",
+            Command = "rhtool_swich"
+        })
+
+        panel:AddControl("CheckBox", {
+            Label = "Show spawn points Debug Labels (see only you)",
+            Command = "rhtool_debugLabels"
+        })
 
 
         local spacerup = vgui.Create("DPanel", panel)
@@ -138,24 +176,9 @@ if CLIENT then
         spacerup:Dock(TOP)
         spacerup.Paint = nil
 
-        panel:AddControl("CheckBox", {
-            Label = "Show spawn points",
-            Command = "sasbaka_swich"
-        })
-
-        panel:AddControl("CheckBox", {
-            Label = "Enable item physics",
-            Command = "sasbaka_freezed"
-        })
-
-        local spacer = vgui.Create("DPanel", panel)
-        spacer:SetTall(40)
-        spacer:Dock(TOP)
-        spacer.Paint = nil
-
         panel:AddControl("Button", {
             Text = "Spawn points settings",
-            Command = "open_items_menu"
+            Command = "RH_open_items_menu"
         })
 
         panel:AddControl("Button", {
@@ -172,11 +195,6 @@ if CLIENT then
             Text = "Remove all spawn points",
             Command = "RH_A_clear_all",
         })
-
-        local spacer2 = vgui.Create("DPanel", panel)
-        spacer2:SetTall(10)
-        spacer2:Dock(TOP)
-        spacer2.Paint = nil
     end
 
 
@@ -191,7 +209,7 @@ if CLIENT then
 
         return wep:GetClass() == "gmod_tool"
             and ply:GetTool() ~= nil
-            and ply:GetTool().Mode == "sasbaka"
+            and ply:GetTool().Mode == "rhtool"
     end
 
     hook.Add("PostDrawTranslucentRenderables", "ToolPreviewSphere", function()
@@ -203,7 +221,7 @@ if CLIENT then
         render.SetColorMaterial()
         render.DrawWireframeSphere(
             tr.HitPos,
-            0.2 * 16,        -- радиус (0.5 юнита ≈ 8–16)
+            0.15 * 16,        -- радиус (0.5 юнита ≈ 8–16)
             12,
             12,
             Color(255, 255, 255),
@@ -216,15 +234,23 @@ end
 
 hook.Add("PostDrawTranslucentRenderables", "DrawEntityIDs", function()
 
-    for _, ent in ipairs(ents.FindByClass("my_spawn_point")) do
-        local RH_visible_text = GetConVar("sasbaka_swich"):GetString()
+    if not LocalPlayer():IsAdmin() then
+        return -- Отменяет открытие меню
+    end
+
+    for _, ent in ipairs(ents.FindByClass("rh_common_unit")) do
+        local RH_visible_text = GetConVar("rhtool_debugLabels"):GetString()
         if not IsValid(ent) then continue end
         if RH_visible_text == "0" then continue end
+
+        local RH_visiblePoint = GetConVar("rhtool_swich"):GetString()
 
         local text = ent:GetID()
         if text == "" then continue end
 
         local pos = ent:GetPos() + Vector(0, 0, 10)
+        local posGROUP = ent:GetPos() + Vector(0, 0, 15)
+        local posPoint = ent:GetPos() + Vector(0, 0, 2)
 
         local ang = LocalPlayer():EyeAngles()
         ang:RotateAroundAxis(ang:Right(), 90)
@@ -234,11 +260,35 @@ hook.Add("PostDrawTranslucentRenderables", "DrawEntityIDs", function()
             draw.SimpleText(
                 text,
                 "DermaLarge",
-                1, 1,
+                0, 0,
                 Color(255, 255, 255),
                 TEXT_ALIGN_CENTER,
                 TEXT_ALIGN_CENTER
             )
         cam.End3D2D()
+
+        cam.Start3D2D(posGROUP, ang, 0.10)
+            draw.SimpleText(
+                "< Blank group >",
+                "DermaLarge",
+                0, 0,
+                Color(255, 255, 255),
+                TEXT_ALIGN_CENTER,
+                TEXT_ALIGN_CENTER
+            )
+        cam.End3D2D()
+
+        if RH_visiblePoint == "0" then
+            cam.Start3D2D(posPoint, ang, 0.25)
+                draw.SimpleText(
+                    "x",
+                    "DermaLarge",
+                    0, 0,
+                    Color(255, 255, 255),
+                    TEXT_ALIGN_CENTER,
+                    TEXT_ALIGN_CENTER
+                )
+            cam.End3D2D()
+        end
     end
 end)

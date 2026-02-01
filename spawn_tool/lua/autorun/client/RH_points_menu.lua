@@ -1,10 +1,18 @@
 local ItemsData = {}
-local currentID = ""
+local currentID = nil
 
-concommand.Add("open_items_menu", function()
+
+concommand.Add("RH_open_items_menu", function()
+
+    if not LocalPlayer():IsAdmin() then
+        print("Доступ запрещен!")
+        notification.AddLegacy("У вас нет прав администратора!", NOTIFY_ERROR, 5)
+        surface.PlaySound("buttons/button10.wav")
+        return false -- Отменяет открытие меню
+    end
 
     local frame = vgui.Create("DFrame")
-    frame:SetSize(680, 480)
+    frame:SetSize(720, 580)
     frame:Center()
     frame:SetTitle("Randomize Here!")
     frame:MakePopup()
@@ -30,7 +38,7 @@ concommand.Add("open_items_menu", function()
         surface.DrawRect(0, 0, w, h)
     end
 
-    --элемент
+        --элемент
     local lblWeapon = vgui.Create("DLabel", headerLeft)
     lblWeapon:SetPos(10, 7)
     lblWeapon:SetText("Point ID")
@@ -48,7 +56,7 @@ concommand.Add("open_items_menu", function()
     addBtnLeft:SetText("+")
     
     local textEntry = vgui.Create("DTextEntry", leftPanelContainer)
-    textEntry:SetPlaceholderText("...") -- показывает серый текст, если пусто 
+    textEntry:SetPlaceholderText("ID name") -- показывает серый текст, если пусто 
     textEntry:Dock(BOTTOM)
     textEntry:DockMargin(5, 5, 5, 5)
 
@@ -57,8 +65,6 @@ concommand.Add("open_items_menu", function()
     -- Правая панель и хедер над ней
     local rightPanelContainer = vgui.Create("DPanel", container)
     rightPanelContainer:Dock(FILL)
-    rightPanelContainer:DockPadding(0, 0, 0, 0)
-    ---rightPanelContainer.Paint = function() end
 
     -- Хедер над правой панелью
     local header = vgui.Create("DPanel", rightPanelContainer)
@@ -72,13 +78,13 @@ concommand.Add("open_items_menu", function()
 
     -- Названия колонок
     local lblWeapon = vgui.Create("DLabel", header)
-    lblWeapon:SetPos(10, 7)
+    lblWeapon:SetPos(30, 7)
     lblWeapon:SetText("Weapon / Entity")
     lblWeapon:SizeToContents()
     lblWeapon:SetTextColor(Color(255, 255, 255))
 
     local lblChance = vgui.Create("DLabel", header)
-    lblChance:SetPos(220, 7)
+    lblChance:SetPos(230, 7)
     lblChance:SetText("Chance")
     lblChance:SizeToContents()
     lblChance:SetTextColor(Color(255, 255, 255))
@@ -90,29 +96,64 @@ concommand.Add("open_items_menu", function()
     lblCount:SetTextColor(Color(255, 255, 255))
 
     -- Правая панель прокрутки
-    local scroll2 = vgui.Create("DScrollPanel", rightPanelContainer)
-    scroll2:Dock(FILL)
+    local scrollRight = vgui.Create("DScrollPanel", rightPanelContainer)
+    scrollRight:Dock(FILL) -- Растягивает по ширине родителя
 
-    local addBtnRight = vgui.Create("DButton", rightPanelContainer)
-    addBtnRight:Dock(BOTTOM)
+    local scroll2 = vgui.Create("DScrollPanel", scrollRight)
+    scroll2:Dock(TOP) -- Растягивает по ширине родителя
+    scroll2:SetTall(250)
+    scroll2:DockMargin(20, 5, 20, 0)
+    scroll2.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, Color(100, 100, 100, 255))
+    end
+
+
+            -- Категория базовых настроек
+    local general_settings = vgui.Create("DCollapsibleCategory", scrollRight)
+    general_settings:Dock(TOP)
+    general_settings:DockMargin(5, 20, 5, 5)
+    general_settings:SetLabel("General settings") -- Текст в заголовке
+    general_settings:SetExpanded(true) -- По умолчанию открыта (false - закрыта)
+    general_settings:SetZPos(1)
+    -- Стилизация заголовка
+    general_settings.Header.Paint = function(self, w, h)
+        draw.RoundedBox(4, 0, 0, w, h, Color(68, 68, 68)) -- Цвет фона шапки
+    end
+    -- Стилизация текста в заголовке
+    general_settings.Header:SetTextColor(Color(255, 255, 255))
+    -- Цвет фона при разворачивании
+    general_settings.Paint = function(self, w, h)
+        draw.RoundedBox(0, 0, 0, w, h, Color(188, 188, 188, 255))
+    end
+
+    local general_container  = vgui.Create("DListLayout", general_settings)
+    general_settings:SetContents(general_container)
+
+    
+
+
+    local addBtnRight = vgui.Create("DButton", scrollRight)
+    addBtnRight:Dock(TOP)
+    addBtnRight:SetZPos(0)
     addBtnRight:SetTall(30)
-    addBtnRight:DockMargin(0, 5, 0, 0)
-    addBtnRight:SetText("+")
+    addBtnRight:DockMargin(20, 5, 20, 0)
+    addBtnRight:SetText("Add weapon / entity")
 
     local function RebuildList(ID)
         scroll2:Clear()
+        general_container:Clear()
         if ItemsData[ID] == 0 then return end
 
         currentID = ID
         if not ItemsData[ID] then return end
 
-        for index, data in ipairs(ItemsData[ID]) do
+        for index, data in ipairs(ItemsData[ID]["ITEMS"]) do
             local panel = vgui.Create("DPanel", scroll2)
             panel:Dock(TOP)
             panel:SetTall(30)
-            panel:DockMargin(2, 0, 2, 2)
+            panel:DockMargin(5, 5, 5, 0)
             panel.Paint = function(self, w, h)
-                draw.RoundedBox(5, 0, 0, w, h, Color(50, 50, 50, 255)) -- цвет фона (RGBA)
+                draw.RoundedBox(5, 0, 0, w, h, Color(0, 0, 0, 150)) -- цвет фона (RGBA)
             end
 
             -- weapon id
@@ -121,7 +162,7 @@ concommand.Add("open_items_menu", function()
             wEntry:SetSize(200, 20)
             wEntry:SetText(data.weapon)
             wEntry.OnChange = function(self)
-                ItemsData[ID][index].weapon = self:GetValue()
+                ItemsData[ID]["ITEMS"][index].weapon = self:GetValue()
             end
 
             -- chance
@@ -130,7 +171,7 @@ concommand.Add("open_items_menu", function()
             cEntry:SetSize(80, 20)
             cEntry:SetValue(data.chance)
             cEntry.OnValueChanged = function(self, val)
-                ItemsData[ID][index].chance = val
+                ItemsData[ID]["ITEMS"][index].chance = val
             end
 
             -- count
@@ -140,7 +181,7 @@ concommand.Add("open_items_menu", function()
             cntEntry:SetValue(data.count)
             cntEntry.OnValueChanged = function(self, val)
                 if val > 0 then
-                    ItemsData[ID][index].count = val
+                    ItemsData[ID]["ITEMS"][index].count = val
                 end
             end
 
@@ -150,10 +191,42 @@ concommand.Add("open_items_menu", function()
             delBtn:SetSize(52, 20)
             delBtn:SetText("Remove")
             delBtn.DoClick = function()
-                table.remove(ItemsData[ID], index)
+                table.remove(ItemsData[ID]["ITEMS"], index)
                 RebuildList(ID) -- обновляем список после удаления
             end
         end
+
+        ---- ПЕРЕКЛЮЧАТЕЛЬ АКТИВАЦИИ
+        local check_Colision = general_container:Add("DCheckBoxLabel")
+        check_Colision:SetText("Colision")
+        check_Colision:DockMargin(10, 5, 5, 0)
+        check_Colision:SetTextColor(Color(0, 0, 0))
+
+        local ColiID = ItemsData[ID]["SETTINGS"].colision
+        check_Colision:SetChecked(ColiID)
+
+        -- Событие при изменении состояния
+        function check_Colision:OnChange(val)
+            ItemsData[ID]["SETTINGS"].colision = val
+        end
+
+        ------------------------
+        local check_Deactivate = general_container:Add("DCheckBoxLabel")
+        check_Deactivate:SetText("Deactivate")
+        check_Deactivate:DockMargin(10, 5, 5, 0)
+        check_Deactivate.Paint = function(self, w, h)
+            check_Deactivate:SetTextColor(Color(0, 0, 0))
+        end
+
+        local DeacID = ItemsData[ID]["SETTINGS"].deactivate
+        check_Deactivate:SetChecked(DeacID)
+
+        -- Событие при изменении состояния
+        function check_Deactivate:OnChange(val)
+            ItemsData[ID]["SETTINGS"].deactivate = val
+        end
+        ------------------------
+
     end
 
     ---RebuildList()
@@ -172,37 +245,49 @@ concommand.Add("open_items_menu", function()
                 draw.RoundedBox(5, 0, 0, w, h, Color(50, 50, 50, 255)) -- цвет фона (RGBA)
             end
 
+            ---
             local BtnID = vgui.Create("DButton", panelId)
             BtnID:SetTall(30)
-            BtnID:SetPos(8, 5)
-            BtnID:SetSize(130, 20)
+            BtnID:SetPos(2, 2)
+            BtnID:SetSize(162, 26)
             BtnID:SetText(key)
             BtnID.ID = key
+            BtnID.CustomColor = Color(50, 50, 50) 
+            BtnID:SetTextColor(Color(255, 255, 255))
+            BtnID.Paint = function(self, w, h)
+                -- Рисуем фон, используя нашу переменную
+                draw.RoundedBox(4, 0, 0, w, h, self.CustomColor)
+            end
             BtnID.DoClick = function(self)
-                print("Нажата кнопка:", self.ID)
                 RebuildList(self.ID)
             end
+            ---
 
             -- кнопка удаления элемента
             local delIDBtn = vgui.Create("DButton", panelId)
-            delIDBtn:SetPos(140, 5)
-            delIDBtn:SetSize(52, 20)
-            delIDBtn:SetText("Remove")
+            delIDBtn:SetPos(170, 5)
+            delIDBtn:SetSize(20, 20)
+            delIDBtn:SetText("×")
+            delIDBtn:SetFont("DermaLarge")
             delIDBtn.DoClick = function()
                 ItemsData[key] = nil
-                currentID = ""
+                currentID = nil
                 RebuildIDList() -- обновляем список после удаления
+                RebuildList()
             end
         end
     end
 
+
+
     RebuildIDList()
+    RebuildList()
     
 
     addBtnRight.DoClick = function()
-        if currentID == "" then return end
+        if not currentID then return end
 
-        table.insert(ItemsData[currentID], {
+        table.insert(ItemsData[currentID]["ITEMS"], {
             weapon = "weapon_pistol",
             chance = 100,
             count = 1
@@ -211,22 +296,40 @@ concommand.Add("open_items_menu", function()
         RebuildList(currentID)
     end
 
+    ------
+
     addBtnLeft.DoClick = function()
-        local ID = textEntry:GetValue()
+        local ID = tostring(textEntry:GetValue())
+
         if ID == "" then return end
 
+        -- Добавляем если нет
         if not ItemsData[ID] then
             ItemsData[ID] = {}
         end
+        if not ItemsData[ID]["ITEMS"] then
+            ItemsData[ID]["ITEMS"] = {}
+        end
 
-        table.insert(ItemsData[ID], {
+
+        table.insert(ItemsData[ID]["ITEMS"], {
             weapon = "weapon_pistol",
             chance = 100,
             count = 1
         })
+        ItemsData[ID]["SETTINGS"] = {
+            group = "general",
+            colision = false,
+            deactivate = false,
+            maxspawns = 2,
+            chance = 25
+        }
 
         RebuildIDList()
     end
+
+
+
 
     -- кнопка отправки
     local sendBtn = vgui.Create("DButton", frame)
@@ -238,21 +341,36 @@ concommand.Add("open_items_menu", function()
         if next(ItemsData) == nil then return end
 
         local json = util.TableToJSON(ItemsData)
+
+        file.Write("my_items_data.txt", json)
+        print("Данные сохранены в garrysmod/data/my_items_data.txt")
+
+        -------------
+        local sendTbl = {}
+        for k, v in pairs(ItemsData) do
+            table.insert(sendTbl, {name = k, data = v})
+        end
+
+        net.Start("RH_A_set_items")
+        net.WriteString(util.TableToJSON(sendTbl))
+        net.SendToServer()
+        -------------
+        sendIdList()
+    end
+
+    function sendIdList()
+        if next(ItemsData) == nil then 
+            RunConsoleCommand("rhtool_iDlist", "Blank point")
+        end
         local keys = {}
 
         for key, _ in pairs(ItemsData) do
             table.insert(keys, key)
         end
         local str = table.concat(keys, ",")  -- склеиваем через запятую
-        print(str)
-
-        RunConsoleCommand("sasbaka_iDlist", str)
-
-
-        net.Start("RH_A_set_items")
-        net.WriteString(json)
-        net.SendToServer()
-
+        RunConsoleCommand("rhtool_iDlist", str)
     end
 
+    sendIdList()
 end)
+

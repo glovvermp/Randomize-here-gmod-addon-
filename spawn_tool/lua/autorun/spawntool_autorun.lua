@@ -10,5 +10,5 @@ if SERVER then
 end
 
 if CLIENT then
-    RunConsoleCommand("sasbaka_iDlist", "empty")
+    RunConsoleCommand("rhtool_iDlist", "empty")
 end
