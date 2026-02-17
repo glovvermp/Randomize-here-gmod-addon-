@@ -1,6 +1,6 @@
 local ItemsData = {}
 local currentID = nil
-
+local SwepList = {}
 
 concommand.Add("RH_open_items_menu", function()
 
@@ -156,14 +156,38 @@ concommand.Add("RH_open_items_menu", function()
                 draw.RoundedBox(5, 0, 0, w, h, Color(0, 0, 0, 150)) -- цвет фона (RGBA)
             end
 
-            -- weapon id
-            local wEntry = vgui.Create("DTextEntry", panel)
-            wEntry:SetPos(5, 5)
-            wEntry:SetSize(200, 20)
-            wEntry:SetText(data.weapon)
-            wEntry.OnChange = function(self)
-                ItemsData[ID]["ITEMS"][index].weapon = self:GetValue()
+
+            local btn = vgui.Create("DButton", panel)
+            btn:SetText(ItemsData[ID]["ITEMS"][index].weapon)
+            btn:SetSize(200, 20)
+            btn:SetPos(5, 5)
+
+            btn.DoClick = function()
+                local menu = DermaMenu()
+
+                menu:SetMaxHeight(ScrH() * 0.5) -- 60% высоты экрана
+                menu:SetMinimumWidth(200)
+
+                menu:AddSpacer()
+
+                for category, class in pairs(SwepList) do
+                    menu:AddOption(category):SetDisabled(true)
+                    for name, class in pairs(SwepList[category]) do
+
+                        menu:AddOption(name, function()
+                            btn:SetText(name)
+                            ItemsData[ID]["ITEMS"][index].weapon = name
+
+                            print(SwepList[category][name])
+                            print(ItemsData[ID]["ITEMS"][index].weapon)
+                        end)
+                    end
+                end
+
+                menu:Open()
             end
+            -----------
+
 
             -- chance
             local cEntry = vgui.Create("DNumberWang", panel)
@@ -185,32 +209,32 @@ concommand.Add("RH_open_items_menu", function()
                 end
             end
 
-            -- кнопка удаления элемента
+            -- delete
             local delBtn = vgui.Create("DButton", panel)
             delBtn:SetPos(380, 5)
             delBtn:SetSize(52, 20)
             delBtn:SetText("Remove")
             delBtn.DoClick = function()
                 table.remove(ItemsData[ID]["ITEMS"], index)
-                RebuildList(ID) -- обновляем список после удаления
+                RebuildList(ID) -- обновляем список
             end
         end
 
         ---- ПЕРЕКЛЮЧАТЕЛЬ АКТИВАЦИИ
         local check_Colision = general_container:Add("DCheckBoxLabel")
-        check_Colision:SetText("Colision")
+        check_Colision:SetText("Collision")
         check_Colision:DockMargin(10, 5, 5, 0)
         check_Colision:SetTextColor(Color(0, 0, 0))
 
-        local ColiID = ItemsData[ID]["SETTINGS"].colision
+        local ColiID = ItemsData[ID]["SETTINGS"].collision
         check_Colision:SetChecked(ColiID)
 
-        -- Событие при изменении состояния
         function check_Colision:OnChange(val)
-            ItemsData[ID]["SETTINGS"].colision = val
+            ItemsData[ID]["SETTINGS"].collision = val
         end
 
-        ------------------------
+
+        ------------------------ Проверка на деактивацию спавна
         local check_Deactivate = general_container:Add("DCheckBoxLabel")
         check_Deactivate:SetText("Deactivate")
         check_Deactivate:DockMargin(10, 5, 5, 0)
@@ -221,15 +245,12 @@ concommand.Add("RH_open_items_menu", function()
         local DeacID = ItemsData[ID]["SETTINGS"].deactivate
         check_Deactivate:SetChecked(DeacID)
 
-        -- Событие при изменении состояния
         function check_Deactivate:OnChange(val)
             ItemsData[ID]["SETTINGS"].deactivate = val
         end
         ------------------------
 
     end
-
-    ---RebuildList()
 
 
     local function RebuildIDList()
@@ -252,11 +273,10 @@ concommand.Add("RH_open_items_menu", function()
             BtnID:SetSize(162, 26)
             BtnID:SetText(key)
             BtnID.ID = key
-            BtnID.CustomColor = Color(50, 50, 50) 
+            BtnID.btColor = Color(50, 50, 50) 
             BtnID:SetTextColor(Color(255, 255, 255))
             BtnID.Paint = function(self, w, h)
-                -- Рисуем фон, используя нашу переменную
-                draw.RoundedBox(4, 0, 0, w, h, self.CustomColor)
+                draw.RoundedBox(4, 0, 0, w, h, self.btColor)
             end
             BtnID.DoClick = function(self)
                 RebuildList(self.ID)
@@ -272,7 +292,7 @@ concommand.Add("RH_open_items_menu", function()
             delIDBtn.DoClick = function()
                 ItemsData[key] = nil
                 currentID = nil
-                RebuildIDList() -- обновляем список после удаления
+                RebuildIDList()
                 RebuildList()
             end
         end
@@ -287,8 +307,8 @@ concommand.Add("RH_open_items_menu", function()
     addBtnRight.DoClick = function()
         if not currentID then return end
 
-        table.insert(ItemsData[currentID]["ITEMS"], {
-            weapon = "weapon_pistol",
+        table.insert(ItemsData[currentID]["ITEMS"], { --Базовые данные для нового элемента
+            weapon = "Pistol",
             chance = 100,
             count = 1
         })
@@ -312,14 +332,14 @@ concommand.Add("RH_open_items_menu", function()
         end
 
 
-        table.insert(ItemsData[ID]["ITEMS"], {
-            weapon = "weapon_pistol",
+        table.insert(ItemsData[ID]["ITEMS"], { --Добавляем новый элемент с базовыми данными
+            weapon = "Pistol",
             chance = 100,
             count = 1
         })
         ItemsData[ID]["SETTINGS"] = {
             group = "general",
-            colision = false,
+            collision = false,
             deactivate = false,
             maxspawns = 2,
             chance = 25
@@ -332,31 +352,82 @@ concommand.Add("RH_open_items_menu", function()
 
 
     -- кнопка отправки
-    local sendBtn = vgui.Create("DButton", frame)
-    sendBtn:Dock(BOTTOM)
+    local panelbuttons = vgui.Create("DPanel", frame)
+    panelbuttons:Dock(BOTTOM)
+    panelbuttons:SetTall(30)
+    panelbuttons:DockMargin(2, 0, 2, 2)
+    panelbuttons.Paint = function(self, w, h)
+        draw.RoundedBox(5, 0, 0, w, h, Color(50, 50, 50, 255)) -- цвет фона (RGBA)
+    end
+
+    local sendBtn = vgui.Create("DButton", panelbuttons)
+    sendBtn:Dock(LEFT)
     sendBtn:SetTall(30)
+    sendBtn:SetWide(350)
     sendBtn:SetText("Apply")
 
+
+    local restoreBtn = vgui.Create("DButton", panelbuttons)
+    restoreBtn:Dock(RIGHT)
+    restoreBtn:SetTall(30)
+    restoreBtn:SetWide(350)
+    restoreBtn:SetText("Restore save")
+
+
+
+    --=========--
     sendBtn.DoClick = function()
         if next(ItemsData) == nil then return end
-
-        local json = util.TableToJSON(ItemsData)
-
-        file.Write("my_items_data.txt", json)
-        print("Данные сохранены в garrysmod/data/my_items_data.txt")
-
         -------------
         local sendTbl = {}
         for k, v in pairs(ItemsData) do
             table.insert(sendTbl, {name = k, data = v})
         end
 
+        local json = util.TableToJSON(sendTbl)
+
+        file.Write("my_items_data.txt", json) -- сохраняем в файл
+
         net.Start("RH_A_set_items")
-        net.WriteString(util.TableToJSON(sendTbl))
+        net.WriteString(json)
         net.SendToServer()
         -------------
         sendIdList()
     end
+
+
+
+
+    restoreBtn.DoClick = function()
+
+        -- Читаем строку из файла
+        local content = file.Read("my_items_data.txt", "DATA")
+
+        if content then
+
+            local tbl = util.JSONToTable(content)
+
+            local fixedTbl = {}
+            for _, entry in ipairs(tbl) do
+                fixedTbl[entry.name] = entry.data
+            end
+
+            data = fixedTbl
+
+            ItemsData = data
+
+            PrintTable(data)
+        else
+            print("No save file found!")
+        end
+
+        RebuildIDList()
+        RebuildList()
+
+    end
+    --=========--
+
+
 
     function sendIdList()
         if next(ItemsData) == nil then 
@@ -367,10 +438,24 @@ concommand.Add("RH_open_items_menu", function()
         for key, _ in pairs(ItemsData) do
             table.insert(keys, key)
         end
-        local str = table.concat(keys, ",")  -- склеиваем через запятую
+        local str = table.concat(keys, ",")
         RunConsoleCommand("rhtool_iDlist", str)
     end
 
     sendIdList()
-end)
 
+
+    net.Receive("RH_SendSWEPSToClient", function() -- Получаем данные от сервера при открытии меню
+        local jsonData = net.ReadString()
+        local tbl = util.JSONToTable(jsonData)
+
+        if tbl then
+            print("Данные от сервера получены:")
+            SwepList = tbl
+            PrintTable(tbl)
+        end
+    end)
+
+    net.Start("RH_OrderSWEPSToClient")
+    net.SendToServer()
+end)

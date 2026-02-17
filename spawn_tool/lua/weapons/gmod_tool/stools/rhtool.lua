@@ -41,9 +41,6 @@ function TOOL:LeftClick(trace)
 end
 
 
-
-
-
 function TOOL:RightClick(trace)
     if CLIENT then return true end
 
@@ -197,9 +194,6 @@ if CLIENT then
         })
     end
 
-
-    
-
     local function IsOurToolActive()
         local ply = LocalPlayer()
         if not IsValid(ply) then return false end
@@ -259,17 +253,6 @@ hook.Add("PostDrawTranslucentRenderables", "DrawEntityIDs", function()
         cam.Start3D2D(pos, ang, 0.15)
             draw.SimpleText(
                 text,
-                "DermaLarge",
-                0, 0,
-                Color(255, 255, 255),
-                TEXT_ALIGN_CENTER,
-                TEXT_ALIGN_CENTER
-            )
-        cam.End3D2D()
-
-        cam.Start3D2D(posGROUP, ang, 0.10)
-            draw.SimpleText(
-                "< Blank group >",
                 "DermaLarge",
                 0, 0,
                 Color(255, 255, 255),
