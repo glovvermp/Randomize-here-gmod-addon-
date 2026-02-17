@@ -8,15 +8,13 @@
 
 This is my own version of an addon for creating points with random spawn of specified items.
 
-This is the first addon I’ve written. I learned GLua during development, and the entire addon was created in about one week.  
-Updates and further support are planned.
+This is the first addon written by me. GLua was learned during development. Updates and support are planned.
 
 > [!CAUTION]
 > - **Bugs are possible.** The addon has not been fully tested and will be fixed over time.
 > - **Spawn points have no limit! Be careful with the amount placed on a map.**
 > - **Currently, all players can interact with all addon functionality.**
->   Admin-only access is planned in future updates.
-> - **No save system temporarily**
+> - **The save system may work incorrectly.**
 
 > [!NOTE]
 > To add an item, open the addon menu, create an item ID and click its name in the list.  
@@ -24,42 +22,59 @@ Updates and further support are planned.
 > - items to spawn
 > - spawn chance
 > - maximum amount  
-> _(the actual amount is randomized between 1 and the specified value)_
->
-> #### How to get the item name:
-> 1. Open the spawn menu (C or F1)
-> 2. Right-click the desired item and select **"Copy to Clipboard"**
-> 3. Paste the copied value into the addon menu
 >
 > Then click **Apply**, and the point IDs will appear in the tool menu list.
 
 - ### [-> Addon Installation <-](#installation)
 - #### [< Developer Contact >](#bug-reports)
 
+
+---
+## Demonstration
+
+### Visual point display options:
+> ![point_visual_variants](https://github.com/user-attachments/assets/d30b3386-5448-4614-b568-e65b4d1e2e35)
+> Points can be displayed not only for admins, but also for players.
+
+### Menu configuration demonstration:
+[Menu demonstration (video)](.github/assets/menu.mp4)
+
+> ![menu](https://github.com/user-attachments/assets/cfd53f37-872b-4087-9b87-e6578dcaca3f)
+>
+> Convenient menu for quick point configuration.
+
+### Spawn demonstration with different settings:
+
+> ![spawn](https://github.com/user-attachments/assets/e825a406-8409-4853-9bd6-0bdf6d4f726f)
+
+> [!NOTE]
+> Возможно, не все GIF будут загружаться сразу.
+
 ---
 
 ## Spawnable item types
 
-✅ – Allowed  
-❌ – Not supported
+🟢 – Any type from this category
+🔴 – Nothing from this category
+🟡 – Will be available in the future
 
 | Type | Spawnable |
 |------|-----------|
-| Weapon / SWEP | ✅ |
-| Entity | ✅ |
-| Prop | ❌ |
-| Vehicle | ❌ |
-| NPC | ❌ |
+| Weapon / SWEP | 🟢 |
+| Entity | 🟢 |
+| Prop | 🔴 |
+| Vehicle | 🟡 |
+| NPC | 🟡 |
 
 > [!CAUTION]
-> If you add an unsupported type (marked ❌) to a spawn point, it will most likely result in errors or the item not spawning.
+> If you specify an unsupported type (🔴), there is a high probability of errors or the item will not spawn.
 
 ---
 
 ## Installation
 
-Copy or move the `spawn_tool` folder into:
-GarrysMod/garrysmod/addons
+Unzip the archive into the directory (only for the latest version):
+GarrysMod\garrysmod\addons
 
 
 ### Steam version (if you are unsure how to install):
@@ -98,6 +113,9 @@ bind "N" "RH_activate_all"
 - [ ] Area-based spawn points
 - [ ] Spawn point color selection
 - [ ] Individual ID activation
+- [ ] Point grouping
+- [ ] Points with item limit in area
+- [ ] Respawn chance configuration
 
 ---
 
@@ -105,6 +123,10 @@ bind "N" "RH_activate_all"
 
 You can create an issue directly on GitHub:
 https://github.com/glovvermp/Randomize-here-gmod-addon-/issues
+
+> [!NOTE]
+> A Discord server is planned.
+
 
 ## Addon authors
 
@@ -114,4 +136,4 @@ Heyzo — structure and code
 
 Pplane — addon concept and prototype version
 
-> Contact information currently unavailable
+> Preferred to remain anonymous
