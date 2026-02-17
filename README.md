@@ -48,8 +48,7 @@ This is the first addon written by me. GLua was learned during development. Upda
 > ![spawn](https://github.com/user-attachments/assets/e825a406-8409-4853-9bd6-0bdf6d4f726f)
 
 > [!NOTE]
-> Возможно, не все GIF будут загружаться сразу.
-
+> Some GIFs may not load immediately.
 ---
 
 ## Spawnable item types
