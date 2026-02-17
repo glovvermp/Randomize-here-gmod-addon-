@@ -38,7 +38,7 @@
 
 ### Демонстрация настройки меню:
 [Демонстрация меню](.github/assets/menu.mp4)
-https://github.com/user-attachments/assets/162b9554-02ea-46e4-ad5d-541860fc04fb
+![menu](https://github.com/user-attachments/assets/cfd53f37-872b-4087-9b87-e6578dcaca3f)
 
 
 > Удобное меню для быстрой настройки точек
