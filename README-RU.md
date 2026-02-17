@@ -33,10 +33,14 @@
 
 ### Варианты визуального отображения точек:
 [Варианты отображения точки](.github/assets/point_visual_variants.gif)
+![point_visual_variants](https://github.com/user-attachments/assets/d30b3386-5448-4614-b568-e65b4d1e2e35)
 > Отобразить точки можно не только для админа, но и для игроков
 
 ### Демонстрация настройки меню:
 [Демонстрация меню](.github/assets/menu.mp4)
+https://github.com/user-attachments/assets/162b9554-02ea-46e4-ad5d-541860fc04fb
+
+
 > Удобное меню для быстрой настройки точек
 
 ---
